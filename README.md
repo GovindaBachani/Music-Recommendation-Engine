@@ -23,6 +23,8 @@ algorithm ends.
 5. /MapReduceVersion/MillionSongCSV.csv : The dataset in the form of CSV.
 6. /MapReduceVersion/FinalResultFile : This is final file where we showcase our clusters. 
 
+# Details of the Task
+
 This Project is done for the classwork for Parallet Data Processing using
 Map Reduce. The program to perform K Means clustering is written for a small subset 
 of data for local Machine while,we executed this on AWS clustered environmet 
