@@ -1,3 +1,7 @@
+/* This is the custom ComparapleWritable class which we can write into HDFS 
+ * output Files, inherits from the ArrayWritable and implements the 
+ * WritableComparable Interface*/
+
 package org.mapreduce.kmeans.songdataset;
 
 import org.apache.hadoop.io.ArrayWritable;

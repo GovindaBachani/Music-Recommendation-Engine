@@ -1,3 +1,5 @@
+/* We represent each song as an Object of the SongDataPoint class
+   implements the WritableComparable Interface*/
 package org.mapreduce.kmeans.songdataset;
 
 import java.io.DataInput;
@@ -12,6 +14,7 @@ public class SongDataPoint implements WritableComparable<SongDataPoint> {
 	Text trackId;
 	Text title;
 	Text artistName;
+	// these are the attributes we use to calculate Euclidean distances.
 	DoubleArrayWritable attributesVector;
 
 	public SongDataPoint() {

@@ -1,3 +1,26 @@
+/* This Project is done for the classwork for Parallet Data Processing using
+ * Map Reduce.
+ * 
+ * This is simple prototype of how a recommendation system works. There are 
+ * different methods by which this can be achieved. I have chosen the K Means 
+ * Clustering algorithm to achieve this task. This program to perform K Means 
+ * clustering is written for a small subset of data for local Machine while,
+ * we Execute this on AWS clustered environmet of 10 EC-2 Large machines. 
+ * 
+ * Typically a K Means CLustering task involves 3 Major Steps listed as below.
+ * 
+ * 1) Random Sampling Task: We chose random K (K here is number of clusters we 
+ * 	  desire) songs from the list of Songs. These K songs serve as the starting
+ *    centroids for our iterations process.
+ * 
+ * 2) Convergence Job: Once we get initial centroids, we create Clusters by 
+ *    grouping songs on the basis of Euclidean distance to the centroids. 
+ *    Once a cluster is formed we make new Centroids based on songs on that
+ *    cluster. We repeat the process till the centroid converges.
+ *   
+ * 3) Clustering Step: Once we have optimal centroids, we create clusters using
+ *    them. And in Final Step we generate the Clusters in a text file.
+ * */
 package org.mapreduce.kmeans.songdataset;
 
 import java.io.BufferedReader;
@@ -167,6 +190,9 @@ public class MapReduceKMeans {
 
 		}
 	}
+	
+	/* This is Clustering Job of the Map Reduce task, we iterate this
+	 * job till all the centroid converges.*/
 
 	public static class MapperClustering extends
 			Mapper<Object, Text, Text, SongDataPoint> {
@@ -277,6 +303,8 @@ public class MapReduceKMeans {
 
 		}
 	}
+	
+	/* Calculating the new Centroid of the Cluster. */
 
 	public static DoubleArrayWritable getNewCentroid(
 			Iterable<SongDataPoint> values) {
@@ -302,6 +330,8 @@ public class MapReduceKMeans {
 		newCentroid.setValueArray(newCentroidArray);
 		return newCentroid;
 	}
+	
+	// Driver Main Method.
 
 	public static void main(String[] args) throws IOException,
 			ClassNotFoundException, InterruptedException, URISyntaxException {
@@ -317,12 +347,16 @@ public class MapReduceKMeans {
 			if (otherArgs.length != 3) {
 				System.err
 						.println("Usage:<CsV Path> "
-								+ "<Centroid File Path> <Final Out Path> <number of Clusters>");
+								+ "<Centroid File Path> "
+								+ "<Final Out Path> "
+								+ "<number of Clusters>");
 				System.exit(2);
 			}
 
 			confRand.set("percentage", "0.7");
 			confRand.set("limit", Integer.toString(i));
+			/* This is the Random Sampling task by which starting 
+			 * Random Songs are selected*/
 			Job job = new Job(confRand);
 			job.setJobName("random Sampling");
 			job.setJarByClass(MapReduceKMeans.class);
@@ -336,6 +370,10 @@ public class MapReduceKMeans {
 			while (!job.waitForCompletion(true)) {
 
 			}
+			
+			/* The iterations to calculate the new centroids for K Clusters 
+			 * start here, These iterations are repeated till the Centroids converge
+			 * and no new Centroid is formed. */
 
 			int iteration = 0;
 
@@ -345,13 +383,16 @@ public class MapReduceKMeans {
 			if (otherArgs.length != 3) {
 				System.err
 						.println("Usage:<CsV Path> "
-								+ "<Centroid File Path> <Final Out Path> <number of Clusters>");
+								+ "<Centroid File Path> "
+								+ "<Final Out Path> "
+								+ "<number of Clusters>");
 				System.exit(2);
 			}
 			Job job1 = new Job(conf);
 
 			boolean flag = false;
 			while (!flag) {
+				// Creating Centroids Folder for each iteration.
 				URI uri = URI.create(otherArgs1[1] + i + centroidPath
 						+ iteration);
 				FileSystem fs = FileSystem.get(uri, conf);
@@ -360,6 +401,11 @@ public class MapReduceKMeans {
 				job1 = new Job(new Configuration());
 				Configuration conf2 = job1.getConfiguration();
 				job1.setJobName("Centroid Step");
+				
+				/* We store all the Centroids in Distributed Cache for 
+				 * each iteration. This step is done to achieve to distribute 
+				 * same copy of centroid from previous step to each Map Task */
+				 
 				for (FileStatus f : items) {
 					String p = f.getPath().toString();
 					if (!p.contains("SUCCESS")) {
@@ -374,7 +420,6 @@ public class MapReduceKMeans {
 
 				job1.setOutputKeyClass(Text.class);
 				job1.setOutputValueClass(SongDataPoint.class);
-				// job1.setNumReduceTasks(2);
 				FileInputFormat.addInputPath(job1, new Path(otherArgs1[0]));
 				FileOutputFormat.setOutputPath(job1, new Path(otherArgs1[1] + i
 						+ centroidPath + iteration));
@@ -383,9 +428,11 @@ public class MapReduceKMeans {
 
 				String oldPath = otherArgs1[1] + i + centroidPath
 						+ (iteration - 1);
-				// System.out.println(oldPath);
 				String newPath = otherArgs1[1] + i + centroidPath + (iteration);
-				// System.out.println(newPath);
+				
+				/*This Step is to check for convergence of Centroids.
+				 * If the centroid converges we stop iteration and continue to 
+				 * the clustering step.*/
 
 				flag = compareHDFSFiles(oldPath, newPath, conf2, iteration);
 			}
@@ -395,9 +442,14 @@ public class MapReduceKMeans {
 					.getRemainingArgs();
 			if (otherArgs.length != 3) {
 				System.err.println("Usage:<CsV Path> "
-						+ "<Centroid File Path> <Final Out Path> ");
+									+ "<Centroid File Path>"
+									+ " <Final Out Path> ");
 				System.exit(2);
 			}
+			
+			/*This is the final step where we cluster the songs into K clusters.
+			 * i.e. number of groups. The final output we get is the file with
+			 * all the clusters.*/
 
 			Job job2 = new Job(confFinal);
 			job2.setJobName("Clustering Step");
@@ -428,6 +480,9 @@ public class MapReduceKMeans {
 				+ ((endTime - currentTime) / 1000));
 	}
 
+	/* This step is taken to compare centroids from the previous iteration 
+	 * and the current iteration centroid files by reading into the 
+	 * Hadoop File System. */
 	private static boolean compareHDFSFiles(String oldPath, String newPath,
 			Configuration conf2, int iteration) throws IOException,
 			NumberFormatException, URISyntaxException {
@@ -437,13 +492,7 @@ public class MapReduceKMeans {
 		FileStatus[] newItems = fs1.listStatus(new Path(newPath));
 		HashSet<ArrayList<Double>> oldFileItems = getItemsInSet(oldItems, fs);
 		HashSet<ArrayList<Double>> newFileItems = getItemsInSet(newItems, fs1);
-		System.out.println("Iteration " + iteration);
-		System.out.println(oldFileItems);
-		System.out.println(newFileItems);
-		System.out.println(oldFileItems.size());
-		System.out.println(newFileItems.size());
-		System.out.println();
-		System.out.println();
+		
 		if (oldFileItems.containsAll(newFileItems)
 				&& newFileItems.containsAll(oldFileItems)) {
 			return true;
@@ -457,7 +506,6 @@ public class MapReduceKMeans {
 		HashSet<ArrayList<Double>> items = new HashSet<ArrayList<Double>>();
 		for (FileStatus f : oldItems) {
 			String p = f.getPath().toString();
-			// System.out.println(p);
 			URI uri = new URI(p);
 			Path path = new Path(uri.toString());
 			FSDataInputStream fsin = fs.open(path);
