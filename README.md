@@ -14,12 +14,12 @@ algorithm ends.
 
 # File Details 
 
-1) /MapReduceVersion/MapReduceKMeans.java : This is the Driver Class which executes the algorithm.
-2) /MapReduceVersion/SongDataPoint.java : This is the Class which represents each song in the system and consists of all the attributes of the song.
-3) /MapReduceVersion/DoubleArrayWritable.java : This is Class which defines all the numeric attributes which form the basis of our algorithm. This class is a part of SongDataPoint class.
-4) /MapReduceVersion/NaNException.java : Custom Exception.
-5) /MapReduceVersion/MillionSongCSV.csv : The dataset in the form of CSV.
-6) /MapReduceVersion/FinalResultFile : This is final file where we showcase our clusters. 
+1. /MapReduceVersion/MapReduceKMeans.java : This is the Driver Class which executes the algorithm.
+2. /MapReduceVersion/SongDataPoint.java : This is the Class which represents each song in the system and consists of all the attributes of the song.
+3. /MapReduceVersion/DoubleArrayWritable.java : This is Class which defines all the numeric attributes which form the basis of our algorithm. This class is a part of SongDataPoint class.
+4. /MapReduceVersion/NaNException.java : Custom Exception.
+5. /MapReduceVersion/MillionSongCSV.csv : The dataset in the form of CSV.
+6. /MapReduceVersion/FinalResultFile : This is final file where we showcase our clusters. 
 
 This Project is done for the classwork for Parallet Data Processing using
 Map Reduce. The program to perform K Means clustering is written for a small subset 
