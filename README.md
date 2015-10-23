@@ -5,6 +5,8 @@ based on the property of songs such as loudness, tempo, pitch and other stuff.
 We recommend pieces of music based on the clusters. This provides the user with
 a more personalized experience. 
 
+# K Means Clustering Algorithm
+
 K-means partitions items into k clusters, randomly at first. Then a centroid is 
 calculated for each cluster as a function of its members. The distance for each
 item is then checked against the clusters' centroids. If an item is found to be
