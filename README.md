@@ -12,11 +12,18 @@ closer to another cluster, it's moved to that cluster. Centroids are recalculate
 each time all items are checked. When no items move during an iteration, the 
 algorithm ends.
 
+# File Details 
+
+1) /MapReduceVersion/MapReduceKMeans.java : This is the Driver Class which executes the algorithm.
+2) /MapReduceVersion/SongDataPoint.java : This is the Class which represents each song in the system and consists of all the attributes of the song.
+3) /MapReduceVersion/DoubleArrayWritable.java : This is Class which defines all the numeric attributes which form the basis of our algorithm. This class is a part of SongDataPoint class.
+4) /MapReduceVersion/NaNException.java : Custom Exception.
+5) /MapReduceVersion/MillionSongCSV.csv : The dataset in the form of CSV.
+6) /MapReduceVersion/FinalResultFile : This is final file where we showcase our clusters. 
+
 This Project is done for the classwork for Parallet Data Processing using
-Map Reduce.
- 
-This program to perform K Means clustering is written for a small subset 
-of data for local Machine while,we Execute this on AWS clustered environmet 
+Map Reduce. The program to perform K Means clustering is written for a small subset 
+of data for local Machine while,we executed this on AWS clustered environmet 
 of 10 EC2 Large machines for a large dataset. 
  
 Typically a K Means CLustering task involves 3 Major Steps listed as below.
