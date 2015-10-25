@@ -49,11 +49,14 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class MapReduceKMeans {
-
+	
+	// This is Global Counter used for the Random Sampling task.
 	private enum COUNTERS {
 		LIMIT
 	}
-
+	
+	/* This is the job where Random Songs are picked up from the data set
+	*  as the starting centroids for the K Mean Process. */
 	public static class RandomSamplingMapper extends
 			Mapper<Object, Text, Text, NullWritable> {
 
@@ -97,6 +100,7 @@ public class MapReduceKMeans {
 		}
 	}
 
+	/* This is iterative job which is repeated till the centroid converges.*/
 	public static class MapReduceKMeansMapper extends
 			Mapper<Object, Text, Text, SongDataPoint> {
 		ArrayList<DoubleArrayWritable> centroids;
@@ -106,7 +110,8 @@ public class MapReduceKMeans {
 				InterruptedException {
 			centroids = new ArrayList<DoubleArrayWritable>();
 			Configuration conf = context.getConfiguration();
-
+			
+			//Distributed Cache is used for same data across EC2 instances on AWS.
 			Path[] cacheFiles = DistributedCache.getLocalCacheFiles(conf);
 			ArrayList<Path> paths = new ArrayList<Path>();
 			for (Path cacheFile : cacheFiles) {
@@ -191,8 +196,8 @@ public class MapReduceKMeans {
 		}
 	}
 	
-	/* This is Clustering Job of the Map Reduce task, we iterate this
-	 * job till all the centroid converges.*/
+	/* This is Clustering Job of the Map Reduce task, we group the songs, with
+	 * finally converged clusters. */
 
 	public static class MapperClustering extends
 			Mapper<Object, Text, Text, SongDataPoint> {
@@ -476,6 +481,8 @@ public class MapReduceKMeans {
 			job2.waitForCompletion(true);
 		}
 		long endTime = System.currentTimeMillis();
+		// Calculating time to understand time variation for different value
+		// of K.
 		System.out.println("Time taken to execute : "
 				+ ((endTime - currentTime) / 1000));
 	}
@@ -499,7 +506,10 @@ public class MapReduceKMeans {
 		}
 		return false;
 	}
-
+	
+	
+	// Reading files for centroid comparison from previous and current iteration.
+	// Storing Centroids in Set for ease of Comparison.
 	private static HashSet<ArrayList<Double>> getItemsInSet(
 			FileStatus[] oldItems, FileSystem fs) throws NumberFormatException,
 			IOException, URISyntaxException {
@@ -530,5 +540,4 @@ public class MapReduceKMeans {
 		}
 		return items;
 	}
-
 }
