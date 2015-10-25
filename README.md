@@ -44,3 +44,16 @@ Typically a K Means CLustering task involves 3 Major Steps listed as below.
 3) Clustering Step: Once we have optimal centroids, we create clusters using
    them. And in Final Step we generate the Clusters in a text file.
 
+# Steps in a basic MapRedue task.
+
+1) Setup : This step is to do any preprocessing thats required to setup the 
+   map task in MapReduce job. This step is executed only once. 
+
+2) Map : This task reads the files which is provided as input line by line and
+   processes each line and outputs key value pairs which is then, and sent into 
+   reduce job after combining data having same key. It emits something like this 
+   (key1, value1), (key1, value2), (key1, value3).
+   
+3) Reduce : This recieves data after all the map tasks are finished. The data 
+   received is somethig like this (key1, (value1,value2,value3,....)). We do 
+   processing on this data and emit the final result for each key. 
