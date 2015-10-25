@@ -32,16 +32,16 @@ of 10 EC2 Large machines for a large dataset.
  
 Typically a K Means CLustering task involves 3 Major Steps listed as below.
  
-1) Random Sampling Task: We chose random K (K here is number of clusters we 
+1) **Random Sampling Task:** We chose random K (K here is number of clusters we 
   desire) songs from the list of Songs. These K songs serve as the starting
   centroids for our iterations process.
  
-2) Convergence Job: Once we get initial centroids, we create Clusters by 
+2) **Convergence Job:** Once we get initial centroids, we create Clusters by 
    grouping songs on the basis of Euclidean distance to the centroids. 
    Once a cluster is formed we make new Centroids based on songs on that
   cluster. We repeat the process till the centroid converges.
    
-3) Clustering Step: Once we have optimal centroids, we create clusters using
+3) **Clustering Step:** Once we have optimal centroids, we create clusters using
    them. And in Final Step we generate the Clusters in a text file.
 
 # Steps in a basic MapRedue task.
